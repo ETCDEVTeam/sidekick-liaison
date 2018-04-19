@@ -99,7 +99,7 @@ while read -r line; do
 	emerald transaction send \
 		# our sidekick's account
 	    0x0e7c045110b8dbf29765047380898919c5cb56f4 \
-	    # our mainnet contract address
+	    # our sidekick contract address
 	    "$sidenet_contract_address" \
 	    0x1 \
 	    --data="$sidenet_contract_notification"
