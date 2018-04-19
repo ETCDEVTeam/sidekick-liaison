@@ -12,11 +12,11 @@ Make sidechain consensus and block progress dependent on interaction with mainne
 
 ## Solution 1
 
-Use identical or similar contracts on mainnet and sidenet to store block requiredHashes. Allowed writers to the contract are restricted by whitelist (here's where sidenet "authorities" come in to play). Use a small script or application to mediate sending transactions between chains at arbitrary intervals and with arbitrary data.
+Use identical or similar contracts on mainnet and sidenet to store block requiredHashes (for example, though the data can be arbitrary). Allowed writers to the contract are restricted by whitelist (here's where sidenet "authorities" come in to play). Use a small script or application (a "sidecar") to mediate sending transactions between chains at arbitrary intervals and with arbitrary data.
 
 __Events:__
 1. Sidenet checkpoint event: send data to mainnet via signed transaction.
-2. Transaction callback: The result of this transaction (or combination result of transaction/contract call) is posted by transaction, this time to a sidenet contract.
+2. Transaction callback: The result of this transaction (or combination result of transaction/contract call) is posted by another transaction, this time to a sidenet contract.
 3. As a part of the validating the next checkpoint, any/all nodes on the sidenet can reference the contract to ensure the last checkpoint transactions were successful and valid.
 
 __Necessary logic:__
