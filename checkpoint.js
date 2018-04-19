@@ -3,9 +3,9 @@
 // 
 // RUN: 
 // 
-// geth --chain blue --js-path="./stdsidekick" js checkpoint.js
+// geth --chain blue --js-path="./std-sidekick" js checkpoint.js
 // OR
-// geth --chain blue --js-path="./stdsidekick" js checkpoint.js | ./sidekick.sh
+// geth --chain blue --js-path="./std-sidekick" js checkpoint.js | ./sidekick.sh
 
 var checkpointContract = "0xdeadbeef10b8dbf29765047380898919deadbeef"
 var checkpointInterval = 50;
