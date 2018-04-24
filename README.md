@@ -1,4 +1,15 @@
-# STD-Sidekick
+# ETCDEVTeam/sidekick-*
+
+> A collection of scripts and documents outlining requirements and initial adhoc solves for a minimum-viable ETC sidechains implementation.
+
+- [github.com/ETCDEVTeam/sidekick-tx2poa](http://github.com/ETCDEVTeam/sidekick-tx2poa). A PoA mechanism implemented through an emphemeral JS console.
+
+- [github.com/ETCDEVTeam/sidekick-liason](http://github.com/ETCDEVTeam/sidekick-liason). A bash script that listens to a sidechain node and facilitates communication with an arbitrary mainnet node. As written, relies on [emerald-cli](https://github.com/ETCDEVTeam/emerald-cli).
+
+- [github.com/ETCDEVTeam/sidekick-checkpointer](http://github.com/ETCDEVTeam/sidekick-checkpointer). A checkpointing mechanism implemented through an ephemerald JS console.
+
+
+# sidekick-liason
 
 ## Problem
 
@@ -22,22 +33,22 @@ __Events:__
 __Necessary logic:__
 1. Mainnet storage contract to receive sidenet checkpoint data
 2. Sidenet storage contract to receive mainnet checkpoint data
-3. Emphemeral JS to initiate checkpoint logic for each geth nodes (eg. [./checkpoint.js](./checkpoint.js))
-4. Sidecar script/app to manage arbitrary data output from _checkpoint.js_ (eg. [./sidekick.sh](./sidekick.sh))
+3. Emphemeral JS to initiate checkpoint logic for each geth nodes (eg. [ETCDEVTeam/sidekick-checkpointer](https://github.com/ETCDEVTeam/sidekick-checkpointer/blob/master/checkpoint.js)
+4. Sidecar script/app to manage arbitrary data output from checkpoint script (eg. [./sidekick.sh](./sidekick.sh))
 
 ### Process and examples
 
-[./sidekick.sh](./sidekick.sh) reads from `stdin` as the recipient of a pipe from the geth client. 
+[./sidekick.sh](./sidekick.sh) reads from `stdin` as the recipient of a pipe from the geth client.
 
 > Geth's display and debug logs use `stderr` exclusively, while `console.log` from geth's JS Console goes to `stdout`. This allows to use geth's `attach`, `console`, or ephemeral `js` subcommands as dedicated data stream writers.
 
 ```
-$ geth --chain sidenet js checkpoints.js | ./sidekick.sh
+$ geth --chain sidenet js checkpoint.js | ./sidekick.sh
 ```
 
-Using `stdin` as a type of notification service from geth, `sidekick.sh` upon receiving a notification (arbitrary `stdin` input) attempts to post a transaction based on this input to the mainnet using a pre-configured remote RPC endpoint. 
+Using `stdin` as a type of notification service from geth, `sidekick.sh` upon receiving a notification (arbitrary `stdin` input) attempts to post a transaction based on this input to the mainnet using a pre-configured remote RPC endpoint.
 
-#### Example 1: data passed is block requiredHash 
+#### Example 1: data passed is block requiredHash
 ```js
 // checkpoint.js
 function formatArbitraryData(block) {
@@ -76,7 +87,7 @@ while read data; do
 
     # or use local geth executable via IPC
     geth --chain mainnet --exec="eth.sendTransaction({to: $mainnet_contract_address, from: $sidekick_address, data: "$block_number$block_hash"});" console
-    
+
 done < "${1:-/dev/stdin}" # Read from file name if given as first parameter $1, otherwise from std input.
 ```
 
@@ -86,7 +97,7 @@ done < "${1:-/dev/stdin}" # Read from file name if given as first parameter $1, 
 var mainnetContractAddress = "0xd67a8aae0d2602a454c6be1324fea4c782f60f3f";
 if (blockIsCheckpoint(block)) {
     var data = formatArbitraryData(block);
-    var signedTx = eth.signTransaction({to: mainnetContractAddress, from: eth.accounts[0], data: data}); 
+    var signedTx = eth.signTransaction({to: mainnetContractAddress, from: eth.accounts[0], data: data});
     console.log(signedTx); // eg. 0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421
 }
 ```
@@ -102,8 +113,6 @@ while read data; do
 
     # or use local geth executable via IPC
     geth --chain mainnet --exec="eth.sendRawTransaction($data);" console
-    
+
 done < "${1:-/dev/stdin}" # Read from file name if given as first parameter $1, otherwise from std input.
 ```
-
-
