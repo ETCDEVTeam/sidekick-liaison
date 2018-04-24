@@ -1,39 +1,39 @@
 #!/usr/bin/env bash
 #
 # Pseudo code
-# 
+#
 # sidekick.sh is a gist of basic design for a __generic__ "sidecar" application
 # which fulfill the bare necessities of bilateral (2-way) sidechain <-> mainnet
 # relationship.
-# 
-# While this design priorities the general and generic aspects of the design, 
+#
+# While this design priorities the general and generic aspects of the design,
 # it should be obvious that much could be done to improve and grow application-specific
 # functionalaity.
-# 
+#
 # There are 2 critical events that need to be managed in order to integrate a sidechain with mainnet.
 # 1. Checkpoint Event 'CE': the sidechain needs to notify an application or otherwise initiate logic at arbitrary checkpoint intervals 'Nci'
 #
 # 		CE[n].block + Nci = CE[n+1].block
 #
 # 2. CE[n] -> func(success, error) callback: the sidechain needs to receive a notification or otherwise initiate logic given a success OR error value returned from CE[n]().
-#   
-# 
+#
+#
 # ----
 # EXAMPLE
-# 
+#
 # For the purposes of this demo, we also need to establish an example of expected behavior for the hypothetical contract running on mainnet.
 # Let's say that the contract is expected to store block hashes from checkpoint blocks on sidenet. When a block hash is added (appended) to the
 # list of stored checkpoint block hashes, the contract returns the sha3 hash of concatenated string Hash[n-1]+ Hash[n] = "0xdeadbeef123...".
-# 
+#
 # ----
-# 
+#
 # Use:
-# 
+#
 # geth --chain side js checkpoint.js | ./sidekick.sh
-# 
+#
 
 upstream=127.0.0.1:8545
-sidestream=127.0.0.1:8545
+sidestream=127.0.0.1:8546
 
 sidenet_checkpoint_block_hash="" # Current $line or other arbitrary data.
 
@@ -46,8 +46,8 @@ upstream_contract_code="" # once upstream contract has been updated with the che
 while read -r line; do
 	echo "Sidecar application received notification of checkpoint event. Data: $line"
 	sidenet_checkpoint_block_hash="$line" # just for example. obviously could be a lot more sophisticated
-	# 1. Send an upstream transaction to store data on mainnet. 
-	# 
+	# 1. Send an upstream transaction to store data on mainnet.
+	#
 	EMERALD_GAS_COST=21 \
 	txHash=$(emerald transaction send \
 		# our sidekick's account
@@ -88,7 +88,7 @@ while read -r line; do
 		res=$(curl -X POST --data '{"jsonrpc":"2.0","method":"eth_getCode","params":["'$upstream_contract_address'", "latest"],"id":1}' "$upstream")
 		# or whatever, however we want to define logic and responsiblity for the sidechain contract
 		sidenet_contract_notification=$(echo "res" | /usr/bin/local/json result)
-	
+
     # Failed to post data to mainnet. This sidechain checkpoint has been compromised. Tell sidechain about failure.
 	else
 		echo "Failed to post checkpoint data to mainnet."
