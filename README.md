@@ -17,7 +17,7 @@ Make sidechain consensus and block progress dependent on interaction with mainne
 
 ### Priorities
 
-- minimize protocol-level changest to client protocol or source code; this is a priority because changes and features introduced to the client will require a far larger development and implementation cycle than adhoc solutions.
+- minimize protocol-level changes to client protocol or source code; this is a priority because changes and features introduced to the client will require a far larger development and implementation cycle than adhoc solutions.
 - assume as little as possible about consensus mechanisms; while PoA is likely to be an associated pattern, we shouldn't assume it as an integral piece of the sidechain "integration" problem.
 - emphasize event handling as opposed to describing data; each sidenet and/or application will have different needs and should be encouraged to develop their own best-fit solutions.
 
